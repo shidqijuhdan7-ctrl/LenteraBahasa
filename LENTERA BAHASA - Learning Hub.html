@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LENTERA BAHASA - Portal Pembelajaran Interaktif SMP</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fff5f5',
+                            100: '#fed7d7',
+                            400: '#f6ad55',
+                            500: '#ed8936',
+                            600: '#dd6b20',
+                            700: '#c05621',
+                        },
+                        indigo: {
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        },
+                        emerald: {
+                            400: '#34d399',
+                            500: '#10b981',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+        }
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .badge-glow {
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- TOP NOTIFICATION BANNER -->
+    <div id="toast-container" class="fixed top-20 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- HEADER / NAVIGATION -->
+    <header class="sticky top-0 z-40 glass-nav border-b border-slate-200/80 transition-all duration-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                
+                <!-- Logo & Title -->
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 via-rose-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-rose-500/20 animate-pulse">
+                        <i class="fa-solid fa-[#ffffff] fa-book-open-reader text-2xl"></i>
+                    </div>
+                    <div>
+                        <span class="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-rose-600 via-amber-600 to-indigo-600 bg-clip-text text-transparent">
+                            LENTERA BAHASA
+                        </span>
+                        <span class="block text-xs font-semibold text-slate-400 tracking-widest uppercase">Portal Interaktif Bahasa Indonesia SMP</span>
+                    </div>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="hidden md:flex flex-1 max-w-md mx-8">
+                    <div class="relative w-full">
+                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="searchInput" onkeyup="filterModules()" placeholder="Cari materi, teks, atau topik bab..." 
+                            class="w-full pl-11 pr-4 py-2.5 rounded-full bg-slate-100 border border-transparent focus:border-indigo-500 focus:bg-white text-sm transition-all focus:outline-none shadow-inner">
+                    </div>
+                </div>
+
+                <!-- User Profile & Gamification Stats -->
+                <div class="flex items-center gap-4">
+                    <!-- XP Counter -->
+                    <div class="flex items-center gap-2 bg-amber-50 border border-amber-200 px-3.5 py-1.5 rounded-full shadow-sm">
+                        <i class="fa-solid fa-bolt text-amber-500 text-lg animate-bounce"></i>
+                        <div>
+                            <div class="text-[10px] uppercase font-bold text-amber-700 tracking-wider">Total XP</div>
+                            <div class="text-sm font-extrabold text-amber-900 leading-none" id="userXp">540 XP</div>
+                        </div>
+                    </div>
+
+                    <!-- User Level Badge -->
+                    <div class="hidden sm:flex items-center gap-2 bg-indigo-50 border border-indigo-200 px-3.5 py-1.5 rounded-full">
+                        <i class="fa-solid fa-shield-halved text-indigo-600 text-lg"></i>
+                        <div>
+                            <div class="text-[10px] uppercase font-bold text-indigo-700 tracking-wider">Level 3</div>
+                            <div class="text-xs font-bold text-indigo-900 leading-none">Detektif Bahasa 🌟</div>
+                        </div>
+                    </div>
+
+                    <!-- Avatar Profile Button -->
+                    <button class="relative group p-0.5 rounded-full bg-gradient-to-tr from-amber-400 to-indigo-600 focus:outline-none">
+                        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Budi" alt="Avatar Siswa" class="w-10 h-10 rounded-full bg-slate-100 border-2 border-white">
+                        <span class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full"></span>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <!-- HERO GAMIFIED BANNER -->
+        <section class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-900 via-indigo-800 to-slate-900 text-white p-6 sm:p-10 shadow-2xl">
+            <!-- Background Decorative Ornaments -->
+            <div class="absolute -right-10 -bottom-10 w-72 h-72 bg-rose-500/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute right-1/3 -top-10 w-72 h-72 bg-amber-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <div class="lg:col-span-8 space-y-4">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/30 border border-indigo-400/30 text-amber-300 text-xs font-semibold uppercase tracking-wider backdrop-blur-md">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Modul Pembelajaran SMP Berbasis Misi
+                    </div>
+                    <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight">
+                        Jelajahi Dunia Kata,<br/>
+                        <span class="bg-gradient-to-r from-amber-300 via-rose-300 to-emerald-300 bg-clip-text text-transparent">Kuasai Bahasa Indonesia!</span>
+                    </h1>
+                    <p class="text-slate-300 text-sm sm:text-base max-w-2xl font-normal leading-relaxed">
+                        Selesaikan tantangan harian, kumpulkan lencana prestasi, dan tingkatkan kemampuan literasimu dari Kelas 7 hingga Kelas 9 dengan seru dan menyenangkan.
+                    </p>
+                    <div class="pt-2 flex flex-wrap gap-4">
+                        <a href="#materi-section" class="px-6 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-600 hover:to-rose-600 text-white font-bold shadow-lg shadow-amber-500/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-gamepad"></i> Mulai Petualangan
+                        </a>
+                        <button onclick="scrollDailyMissions()" class="px-6 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold backdrop-blur-md transition-all text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-bullseye text-rose-400"></i> Tantangan Harian
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Hero Graphic Dynamic Stats -->
+                <div class="lg:col-span-4 flex justify-center">
+                    <div class="w-full max-w-xs bg-white/10 border border-white/15 backdrop-blur-md rounded-2xl p-5 space-y-4 shadow-xl animate-float">
+                        <div class="flex items-center justify-between text-xs font-bold text-slate-300 uppercase tracking-wider">
+                            <span>Kemajuan Belajar</span>
+                            <span class="text-amber-400">Semesta 1</span>
+                        </div>
+                        <!-- Progress Circle Demo -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-sm font-semibold">
+                                <span>Total Misi Tuntas</span>
+                                <span class="font-bold text-amber-300">68%</span>
+                            </div>
+                            <div class="w-full bg-slate-700/60 rounded-full h-3 p-0.5">
+                                <div class="bg-gradient-to-r from-amber-400 to-rose-500 h-2 rounded-full transition-all duration-500" style="width: 68%"></div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 pt-2 text-center text-xs">
+                            <div class="bg-white/5 border border-white/10 p-2.5 rounded-xl">
+                                <div class="font-extrabold text-lg text-white">12</div>
+                                <div class="text-slate-400">Modul Dibuka</div>
+                            </div>
+                            <div class="bg-white/5 border border-white/10 p-2.5 rounded-xl">
+                                <div class="font-extrabold text-lg text-amber-400">5</div>
+                                <div class="text-slate-400">Lencana Diraih</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MAIN LAYOUT GRID (MODULES + SIDEBAR DASHBOARD) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8" id="materi-section">
+            
+            <!-- LEFT COLUMN: MODULES HUB (8 Cols) -->
+            <div class="lg:col-span-8 space-y-6">
+
+                <!-- Grade Filter Tabs -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-3 rounded-2xl shadow-sm border border-slate-200/80">
+                    <span class="text-sm font-bold text-slate-600 px-3 flex items-center gap-2">
+                        <i class="fa-solid fa-layer-group text-indigo-500"></i> Pilih Jenjang:
+                    </span>
+                    <div class="flex flex-wrap gap-2" id="gradeTabs">
+                        <button onclick="filterGrade('all')" class="grade-btn active px-4 py-2 rounded-xl text-xs font-bold transition-all bg-indigo-600 text-white shadow-md shadow-indigo-600/20" data-grade="all">
+                            Semua Kelas
+                        </button>
+                        <button onclick="filterGrade('7')" class="grade-btn px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-all" data-grade="7">
+                            Kelas 7 SMP
+                        </button>
+                        <button onclick="filterGrade('8')" class="grade-btn px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-all" data-grade="8">
+                            Kelas 8 SMP
+                        </button>
+                        <button onclick="filterGrade('9')" class="grade-btn px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-all" data-grade="9">
+                            Kelas 9 SMP
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Module Cards Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5" id="modulesGrid">
+                    
+                    <!-- Card 1: Teks Deskripsi -->
+                    <div class="module-card group bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between" data-grade="7" data-title="teks deskripsi">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-[11px] font-extrabold border border-emerald-200">Kelas 7</span>
+                                <span class="text-slate-400 text-xs font-semibold flex items-center gap-1"><i class="fa-regular fa-clock"></i> 4 Sub-Bab</span>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl mb-3 group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-mountain-sun"></i>
+                            </div>
+                            <h3 class="text-base font-bold text-slate-800 mb-1 group-hover:text-indigo-600 transition-colors">Teks Deskripsi</h3>
+                            <p class="text-slate-500 text-xs leading-relaxed line-clamp-2">Mengamati, menggambarkan keindahan alam, objek, dan suasana dengan kata-kata konkret.</p>
+                        </div>
+                        <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-400 flex items-center gap-1">
+                                <i class="fa-solid fa-trophy text-amber-500"></i> +100 XP
+                            </span>
+                            <button onclick="openModuleModal('Teks Deskripsi', 7, 'Mengamati dan menggambarkan objek secara terperinci.')" class="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-indigo-600 text-white text-xs font-bold transition-colors flex items-center gap-1.5">
+                                Jelajahi Modul <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Teks Narasi & Fantasi -->
+                    <div class="module-card group bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between" data-grade="7" data-title="teks narasi fantasi cerita imajinasi">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-[11px] font-extrabold border border-emerald-200">Kelas 7</span>
+                                <span class="text-slate-400 text-xs font-semibold flex items-center gap-1"><i class="fa-regular fa-clock"></i> 5 Sub-Bab</span>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl mb-3 group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-dragon"></i>
+                            </div>
+                            <h3 class="text-base font-bold text-slate-800 mb-1 group-hover:text-indigo-600 transition-colors">Teks Narasi & Cerita Fantasi</h3>
+                            <p class="text-slate-500 text-xs leading-relaxed line-clamp-2">Mengarungi dunia imajinasi, keajaiban tokoh, serta alur cerita yang menakjubkan.</p>
+                        </div>
+                        <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-400 flex items-center gap-1">
+                                <i class="fa-solid fa-trophy text-amber-500"></i> +120 XP
+                            </span>
+                            <button onclick="openModuleModal('Teks Narasi & Fantasi', 7, 'Menganalisis dan merancang cerita imajinasi.')" class="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-indigo-600 text-white text-xs font-bold transition-colors flex items-center gap-1.5">
+                                Jelajahi Modul <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Teks Laporan Hasil Observasi -->
+                    <div class="module-card group bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between" data-grade="8" data-title="teks laporan hasil observasi lho fakta">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 text-[11px] font-extrabold border border-indigo-200">Kelas 8</span>
+                                <span class="text-slate-400 text-xs font-semibold flex items-center gap-1"><i class="fa-regular fa-clock"></i> 3 Sub-Bab</span>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl mb-3 group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-magnifying-glass-chart"></i>
+                            </div>
+                            <h3 class="text-base font-bold text-slate-800 mb-1 group-hover:text-indigo-600 transition-colors">Teks Laporan Hasil Observasi</h3>
+                            <p class="text-slate-500 text-xs leading-relaxed line-clamp-2">Menyajikan fakta sistematis hasil pengamatan alam dan fenomena sosial secara objektif.</p>
+                        </div>
+                        <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-400 flex items-center gap-1">
+                                <i class="fa-solid fa-trophy text-amber-500"></i> +150 XP
+                            </span>
+                            <button onclick="openModuleModal('Teks Laporan Hasil Observasi', 8, 'Menulis laporan berbasis data objektif.')" class="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-indigo-600 text-white text-xs font-bold transition-colors flex items-center gap-1.5">
+                                Jelajahi Modul <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Card 4: Teks Iklan, Slogan, & Poster -->
+                    <div class="module-card group bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between" data-grade="8" data-title="iklan slogan poster persuasif komersial">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 text-[11px] font-extrabold border border-indigo-200">Kelas 8</span>
+                                <span class="text-slate-400 text-xs font-semibold flex items-center gap-1"><i class="fa-regular fa-clock"></i> 4 Sub-Bab</span>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-xl mb-3 group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-bullhorn"></i>
+                            </div>
+                            <h3 class="text-base font-bold text-slate-800 mb-1 group-hover:text-indigo-600 transition-colors">Iklan, Slogan, & Poster</h3>
+                            <p class="text-slate-500 text-xs leading-relaxed line-clamp-2">Seni membujuk dan menyampaikan pesan komunikatif melalui media visual persuasif.</p>
+                        </div>
+                        <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-400 flex items-center gap-1">
+                                <i class="fa-solid fa-trophy text-amber-500"></i> +110 XP
+                            </span>
+                            <button onclick="openModuleModal('Iklan, Slogan, & Poster', 8, 'Memahami unsur persuasif media publikasi.')" class="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-indigo-600 text-white text-xs font-bold transition-colors flex items-center gap-1.5">
+                                Jelajahi Modul <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Card 5: Teks Laporan Percobaan -->
+                    <div class="module-card group bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between" data-grade="9" data-title="teks laporan percobaan eksperimen karya ilmiah">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="px-2.5 py-1 rounded-lg bg-rose-50 text-rose-700 text-[11px] font-extrabold border border-rose-200">Kelas 9</span>
+                                <span class="text-slate-400 text-xs font-semibold flex items-center gap-1"><i class="fa-regular fa-clock"></i> 5 Sub-Bab</span>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl mb-3 group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-flask-vial"></i>
+                            </div>
+                            <h3 class="text-base font-bold text-slate-800 mb-1 group-hover:text-indigo-600 transition-colors">Teks Laporan Percobaan</h3>
+                            <p class="text-slate-500 text-xs leading-relaxed line-clamp-2">Penyusunan laporan eksperimen ilmiah dengan kaidah kebahasaan yang teliti.</p>
+                        </div>
+                        <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-400 flex items-center gap-1">
+                                <i class="fa-solid fa-trophy text-amber-500"></i> +160 XP
+                            </span>
+                            <button onclick="openModuleModal('Teks Laporan Percobaan', 9, 'Merancang dan melaporkan hasil sains.')" class="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-indigo-600 text-white text-xs font-bold transition-colors flex items-center gap-1.5">
+                                Jelajahi Modul <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Card 6: Teks Diskusi & Kritis -->
+                    <div class="module-card group bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between" data-grade="9" data-title="teks diskusi pro kontra argumentasi kritis">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="px-2.5 py-1 rounded-lg bg-rose-50 text-rose-700 text-[11px] font-extrabold border border-rose-200">Kelas 9</span>
+                                <span class="text-slate-400 text-xs font-semibold flex items-center gap-1"><i class="fa-regular fa-clock"></i> 4 Sub-Bab</span>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-xl mb-3 group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-comments text-amber-600"></i>
+                            </div>
+                            <h3 class="text-base font-bold text-slate-800 mb-1 group-hover:text-indigo-600 transition-colors">Teks Diskusi & Berpikir Kritis</h3>
+                            <p class="text-slate-500 text-xs leading-relaxed line-clamp-2">Menyusun argumen pro dan kontra secara logis, santun, serta berimbang.</p>
+                        </div>
+                        <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-400 flex items-center gap-1">
+                                <i class="fa-solid fa-trophy text-amber-500"></i> +140 XP
+                            </span>
+                            <button onclick="openModuleModal('Teks Diskusi', 9, 'Menalar argumen dua sudut pandang.')" class="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-indigo-600 text-white text-xs font-bold transition-colors flex items-center gap-1.5">
+                                Jelajahi Modul <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- MINI-GAME / QUIZ TEASER WIDGET -->
+                <div class="bg-gradient-to-r from-amber-500 via-rose-500 to-indigo-600 p-0.5 rounded-3xl shadow-lg">
+                    <div class="bg-slate-900 rounded-[23px] p-6 text-white flex flex-col md:flex-row items-center justify-between gap-6">
+                        <div class="space-y-2 text-center md:text-left">
+                            <span class="px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-bold uppercase tracking-wider">
+                                <i class="fa-solid fa-gamepad"></i> Zona Asah Otak
+                            </span>
+                            <h3 class="text-xl font-extrabold">Uji Kemampuan EBI & Majas!</h3>
+                            <p class="text-xs text-slate-300 max-w-md">Kuis interaktif kilat 60 detik untuk melatih pemahaman tata bahasa dan kosakata khas SMP.</p>
+                        </div>
+                        <button onclick="openQuizDemo()" class="w-full md:w-auto px-6 py-3 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-extrabold text-sm shadow-lg shadow-amber-500/30 transition-all flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-play"></i> Main Kuis Kilat
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN: GAMIFICATION & DASHBOARD SIDEBAR (4 Cols) -->
+            <div class="lg:col-span-4 space-y-6">
+
+                <!-- DAILY MISSIONS CONTAINER -->
+                <div id="daily-missions" class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center">
+                                <i class="fa-solid fa-bullseye"></i>
+                            </div>
+                            <h2 class="font-extrabold text-slate-800 text-base">Tantangan Harian</h2>
+                        </div>
+                        <span class="text-[11px] font-bold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full">Reset 12 jam lagi</span>
+                    </div>
+
+                    <!-- Mission Checklist -->
+                    <div class="space-y-3" id="missionList">
+                        <!-- Item 1 -->
+                        <div class="p-3 rounded-2xl border border-slate-100 bg-slate-50/50 flex items-start gap-3 transition-all hover:bg-slate-50" id="mission-1">
+                            <input type="checkbox" onchange="completeMission(this, 30)" class="mt-1 w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer">
+                            <div class="flex-1">
+                                <div class="text-xs font-bold text-slate-700">Baca 1 Rangkuman Teks Deskripsi</div>
+                                <div class="text-[10px] font-bold text-amber-600 flex items-center gap-1 mt-0.5">
+                                    <i class="fa-solid fa-bolt"></i> +30 XP
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Item 2 -->
+                        <div class="p-3 rounded-2xl border border-slate-100 bg-slate-50/50 flex items-start gap-3 transition-all hover:bg-slate-50" id="mission-2">
+                            <input type="checkbox" onchange="completeMission(this, 50)" class="mt-1 w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer">
+                            <div class="flex-1">
+                                <div class="text-xs font-bold text-slate-700">Selesaikan Mini Kuis Majas</div>
+                                <div class="text-[10px] font-bold text-amber-600 flex items-center gap-1 mt-0.5">
+                                    <i class="fa-solid fa-bolt"></i> +50 XP
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Item 3 -->
+                        <div class="p-3 rounded-2xl border border-slate-100 bg-slate-50/50 flex items-start gap-3 transition-all hover:bg-slate-50" id="mission-3">
+                            <input type="checkbox" onchange="completeMission(this, 40)" class="mt-1 w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer">
+                            <div class="flex-1">
+                                <div class="text-xs font-bold text-slate-700">Cari Arti 3 Kata Sulit di Kamus</div>
+                                <div class="text-[10px] font-bold text-amber-600 flex items-center gap-1 mt-0.5">
+                                    <i class="fa-solid fa-bolt"></i> +40 XP
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LEADERBOARD PREVIEW -->
+                <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center">
+                                <i class="fa-solid fa-trophy"></i>
+                            </div>
+                            <h2 class="font-extrabold text-slate-800 text-base">Papan Peringkat</h2>
+                        </div>
+                        <span class="text-xs font-bold text-indigo-600">Minggu Ini</span>
+                    </div>
+
+                    <div class="space-y-3">
+                        <!-- Top 1 -->
+                        <div class="flex items-center justify-between p-2.5 rounded-2xl bg-amber-50/60 border border-amber-200/60">
+                            <div class="flex items-center gap-3">
+                                <span class="w-6 text-center font-extrabold text-amber-700 text-sm">1</span>
+                                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Siti" class="w-8 h-8 rounded-full bg-amber-200">
+                                <div>
+                                    <div class="text-xs font-bold text-slate-800">Siti Rahma</div>
+                                    <div class="text-[10px] text-slate-500">Kelas 8-A</div>
+                                </div>
+                            </div>
+                            <span class="text-xs font-extrabold text-amber-700">1,240 XP</span>
+                        </div>
+
+                        <!-- Top 2 -->
+                        <div class="flex items-center justify-between p-2.5 rounded-2xl bg-slate-50 border border-slate-100">
+                            <div class="flex items-center gap-3">
+                                <span class="w-6 text-center font-extrabold text-slate-400 text-sm">2</span>
+                                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Ahmad" class="w-8 h-8 rounded-full bg-slate-200">
+                                <div>
+                                    <div class="text-xs font-bold text-slate-800">Ahmad Rizky</div>
+                                    <div class="text-[10px] text-slate-500">Kelas 9-C</div>
+                                </div>
+                            </div>
+                            <span class="text-xs font-extrabold text-slate-600">980 XP</span>
+                        </div>
+
+                        <!-- Top 3 -->
+                        <div class="flex items-center justify-between p-2.5 rounded-2xl bg-amber-900/5 border border-amber-800/10">
+                            <div class="flex items-center gap-3">
+                                <span class="w-6 text-center font-extrabold text-amber-900 text-sm">3</span>
+                                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Dewi" class="w-8 h-8 rounded-full bg-amber-100">
+                                <div>
+                                    <div class="text-xs font-bold text-slate-800">Dewi Lestari</div>
+                                    <div class="text-[10px] text-slate-500">Kelas 7-B</div>
+                                </div>
+                            </div>
+                            <span class="text-xs font-extrabold text-amber-900">850 XP</span>
+                        </div>
+
+                        <!-- User position -->
+                        <div class="pt-2 border-t border-slate-100 flex items-center justify-between p-2 rounded-2xl bg-indigo-50 border border-indigo-100">
+                            <div class="flex items-center gap-3">
+                                <span class="w-6 text-center font-extrabold text-indigo-600 text-sm">14</span>
+                                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Budi" class="w-8 h-8 rounded-full bg-indigo-200">
+                                <div>
+                                    <div class="text-xs font-extrabold text-indigo-900">Kamu (Budi)</div>
+                                    <div class="text-[10px] text-indigo-600">Kelas 7-A</div>
+                                </div>
+                            </div>
+                            <span class="text-xs font-extrabold text-indigo-700" id="sidebarUserXp">540 XP</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BADGES BADGE COLLECTION PREVIEW -->
+                <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center">
+                                <i class="fa-solid fa-award"></i>
+                            </div>
+                            <h2 class="font-extrabold text-slate-800 text-base">Lencana Prestasi</h2>
+                        </div>
+                        <span class="text-xs font-bold text-slate-400">3/8 Terbuka</span>
+                    </div>
+
+                    <div class="grid grid-cols-4 gap-3 text-center">
+                        <!-- Badge 1 (Unlocked) -->
+                        <div class="group relative flex flex-col items-center">
+                            <div class="w-12 h-12 rounded-2xl bg-amber-100 border-2 border-amber-400 flex items-center justify-center text-amber-600 text-xl shadow-md cursor-pointer hover:scale-110 transition-transform">
+                                🔍
+                            </div>
+                            <span class="text-[10px] font-bold text-slate-700 mt-1">Detektif Teks</span>
+                        </div>
+
+                        <!-- Badge 2 (Unlocked) -->
+                        <div class="group relative flex flex-col items-center">
+                            <div class="w-12 h-12 rounded-2xl bg-rose-100 border-2 border-rose-400 flex items-center justify-center text-rose-600 text-xl shadow-md cursor-pointer hover:scale-110 transition-transform">
+                                ✍️
+                            </div>
+                            <span class="text-[10px] font-bold text-slate-700 mt-1">Pujangga</span>
+                        </div>
+
+                        <!-- Badge 3 (Unlocked) -->
+                        <div class="group relative flex flex-col items-center">
+                            <div class="w-12 h-12 rounded-2xl bg-indigo-100 border-2 border-indigo-400 flex items-center justify-center text-indigo-600 text-xl shadow-md cursor-pointer hover:scale-110 transition-transform">
+                                📘
+                            </div>
+                            <span class="text-[10px] font-bold text-slate-700 mt-1">Master EBI</span>
+                        </div>
+
+                        <!-- Badge 4 (Locked) -->
+                        <div class="group relative flex flex-col items-center opacity-40 grayscale">
+                            <div class="w-12 h-12 rounded-2xl bg-slate-100 border-2 border-slate-300 flex items-center justify-center text-slate-400 text-xl cursor-not-allowed">
+                                🔒
+                            </div>
+                            <span class="text-[10px] font-bold text-slate-500 mt-1">Orator</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="mt-auto bg-slate-900 text-slate-400 border-t border-slate-800 text-sm py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center text-white">
+                    <i class="fa-solid fa-book-open"></i>
+                </div>
+                <span class="font-bold text-white tracking-wide">LENTERA BAHASA SMP</span>
+            </div>
+            <p class="text-xs text-slate-500">© 2026 Platform Interaktif Pembelajaran Bahasa Indonesia SMP. Didesain untuk Pembelajar Masa Depan.</p>
+            <div class="flex gap-4 text-xs font-semibold">
+                <a href="#" class="hover:text-white transition-colors">Panduan Guru</a>
+                <a href="#" class="hover:text-white transition-colors">Pusat Bantuan</a>
+                <a href="#" class="hover:text-white transition-colors">Kurikulum Merdeka</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- DYNAMIC MODULE PREVIEW MODAL -->
+    <div id="moduleModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm hidden p-4">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-6 relative border border-slate-100 animate-in fade-in zoom-in duration-200">
+            <!-- Close Button -->
+            <button onclick="closeModuleModal()" class="absolute top-5 right-5 w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition-colors">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- Modal Header -->
+            <div class="space-y-2">
+                <div class="flex items-center gap-2">
+                    <span id="modalGradeBadge" class="px-2.5 py-0.5 rounded-md bg-indigo-100 text-indigo-700 text-xs font-bold">Kelas 7</span>
+                    <span class="text-xs text-slate-400 font-semibold">• Kurikulum Merdeka</span>
+                </div>
+                <h2 id="modalTitle" class="text-2xl font-extrabold text-slate-900">Judul Modul</h2>
+                <p id="modalDesc" class="text-xs sm:text-sm text-slate-500 leading-relaxed">Deskripsi singkat fokus pembelajaran modul ini.</p>
+            </div>
+
+            <!-- TAB PLACEHOLDERS INSIDE MODAL -->
+            <div class="border-b border-slate-200 flex gap-4 text-xs font-bold">
+                <button class="pb-2 border-b-2 border-indigo-600 text-indigo-600 flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-play"></i> Video Interaktif
+                </button>
+                <button class="pb-2 border-b-2 border-transparent text-slate-400 hover:text-slate-600 flex items-center gap-1.5">
+                    <i class="fa-solid fa-file-lines"></i> Rangkuman Materi
+                </button>
+                <button class="pb-2 border-b-2 border-transparent text-slate-400 hover:text-slate-600 flex items-center gap-1.5">
+                    <i class="fa-solid fa-pen-to-square"></i> Latihan Kuis
+                </button>
+            </div>
+
+            <!-- CONTENT STRUCTURE PLACEHOLDERS (NO HEAVY MATERIAL YET) -->
+            <div class="space-y-4">
+                <!-- Video/Media Placeholder Container -->
+                <div class="w-full h-48 sm:h-56 bg-slate-100 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center p-4 text-center">
+                    <div class="w-12 h-12 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl mb-2">
+                        <i class="fa-solid fa-play"></i>
+                    </div>
+                    <span class="text-xs font-bold text-slate-700">Wadah Video & Animator Pembelajaran</span>
+                    <span class="text-[11px] text-slate-400 mt-1 max-w-xs">Materi multimedia interaktif dapat diinjeksikan di sini.</span>
+                </div>
+
+                <!-- Sub-topic Checklist Placeholder -->
+                <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 space-y-2">
+                    <div class="text-xs font-bold text-slate-700">Rencana Pembelajaran Sub-Bab:</div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-600">
+                        <div class="flex items-center gap-2"><i class="fa-solid fa-check-circle text-emerald-500"></i> Sub-Bab 1: Pengertian & Ciri</div>
+                        <div class="flex items-center gap-2"><i class="fa-solid fa-circle text-slate-300 text-[8px]"></i> Sub-Bab 2: Struktur Teks</div>
+                        <div class="flex items-center gap-2"><i class="fa-solid fa-circle text-slate-300 text-[8px]"></i> Sub-Bab 3: Kaidah Kebahasaan</div>
+                        <div class="flex items-center gap-2"><i class="fa-solid fa-circle text-slate-300 text-[8px]"></i> Sub-Bab 4: Proyek Menulis</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="pt-2 flex justify-end gap-3">
+                <button onclick="closeModuleModal()" class="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50">Tutup</button>
+                <button onclick="startMissionAction()" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-600/20">Mulai Pembelajaran</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QUIZ DEMO MODAL -->
+    <div id="quizModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm hidden p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl space-y-6 relative border border-slate-100">
+            <button onclick="closeQuizDemo()" class="absolute top-5 right-5 w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            
+            <div class="flex items-center gap-2">
+                <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold">Kuis Kilat EBI</span>
+                <span class="text-xs text-slate-400 font-semibold">Soal 1 dari 1</span>
+            </div>
+
+            <div class="space-y-4">
+                <h3 class="text-base font-bold text-slate-800">Manakah dari kalimat berikut yang menggunakan majas <span class="text-indigo-600 underline">Personifikasi</span> dengan tepat?</h3>
+                
+                <div class="space-y-2" id="quizOptions">
+                    <button onclick="answerQuiz(false, this)" class="w-full text-left p-3.5 rounded-xl border border-slate-200 text-xs font-medium hover:border-indigo-500 hover:bg-indigo-50/50 transition-all flex items-center justify-between">
+                        <span>A. Wajahnya bersinar bagaikan rembulan di malam hari.</span>
+                        <i class="fa-regular fa-circle text-slate-300"></i>
+                    </button>
+                    <button onclick="answerQuiz(true, this)" class="w-full text-left p-3.5 rounded-xl border border-slate-200 text-xs font-medium hover:border-indigo-500 hover:bg-indigo-50/50 transition-all flex items-center justify-between">
+                        <span>B. Nyiur melambai-lambai di tepi pantai menyapa sang surya.</span>
+                        <i class="fa-regular fa-circle text-slate-300"></i>
+                    </button>
+                    <button onclick="answerQuiz(false, this)" class="w-full text-left p-3.5 rounded-xl border border-slate-200 text-xs font-medium hover:border-indigo-500 hover:bg-indigo-50/50 transition-all flex items-center justify-between">
+                        <span>C. Suaranya menggelegar membelah angkasa.</span>
+                        <i class="fa-regular fa-circle text-slate-300"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="quizFeedback" class="hidden p-3 rounded-xl text-xs font-bold text-center"></div>
+
+            <div class="flex justify-end pt-2">
+                <button onclick="closeQuizDemo()" class="px-5 py-2.5 rounded-xl bg-slate-900 text-white text-xs font-bold">Selesai</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT FOR INTERACTION -->
+    <script>
+        let currentXP = 540;
+
+        // Grade Filter Logic
+        function filterGrade(grade) {
+            const buttons = document.querySelectorAll('.grade-btn');
+            buttons.forEach(btn => {
+                if (btn.getAttribute('data-grade') === grade) {
+                    btn.classList.add('bg-indigo-600', 'text-white', 'shadow-md', 'shadow-indigo-600/20');
+                    btn.classList.remove('text-slate-600', 'hover:bg-slate-100');
+                } else {
+                    btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-md', 'shadow-indigo-600/20');
+                    btn.classList.add('text-slate-600', 'hover:bg-slate-100');
+                }
+            });
+
+            const cards = document.querySelectorAll('.module-card');
+            cards.forEach(card => {
+                if (grade === 'all' || card.getAttribute('data-grade') === grade) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Live Search Filter Logic
+        function filterModules() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.module-card');
+
+            cards.forEach(card => {
+                const title = card.getAttribute('data-title').toLowerCase();
+                if (title.includes(query)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Daily Mission Check Interaction
+        function completeMission(checkbox, xpValue) {
+            if (checkbox.checked) {
+                currentXP += xpValue;
+                updateXPDisplay();
+                showToast(`+${xpValue} XP Diraih! Selamat! 🎉`);
+                checkbox.disabled = true;
+                checkbox.parentElement.classList.add('opacity-50', 'line-through');
+            }
+        }
+
+        function updateXPDisplay() {
+            document.getElementById('userXp').innerText = `${currentXP} XP`;
+            document.getElementById('sidebarUserXp').innerText = `${currentXP} XP`;
+        }
+
+        // Toast Notification System
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-xl text-xs font-bold flex items-center gap-2 border border-slate-700 pointer-events-auto transform transition-all duration-300 translate-y-2 opacity-0';
+            toast.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> ${message}`;
+            
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Modal Controls
+        function openModuleModal(title, grade, desc) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalGradeBadge').innerText = `Kelas ${grade} SMP`;
+            document.getElementById('modalDesc').innerText = desc;
+            document.getElementById('moduleModal').classList.remove('hidden');
+        }
+
+        function closeModuleModal() {
+            document.getElementById('moduleModal').classList.add('hidden');
+        }
+
+        function startMissionAction() {
+            closeModuleModal();
+            showToast('Modul berhasil dibuka! Selamat belajar.');
+        }
+
+        // Quiz Modal Logic
+        function openQuizDemo() {
+            document.getElementById('quizFeedback').classList.add('hidden');
+            document.getElementById('quizModal').classList.remove('hidden');
+        }
+
+        function closeQuizDemo() {
+            document.getElementById('quizModal').classList.add('hidden');
+        }
+
+        function answerQuiz(isCorrect, btnElement) {
+            const feedback = document.getElementById('quizFeedback');
+            feedback.classList.remove('hidden');
+            
+            if (isCorrect) {
+                feedback.className = "p-3 rounded-xl text-xs font-bold text-center bg-emerald-100 text-emerald-800 border border-emerald-200";
+                feedback.innerText = "Jawaban Tepat! 🎉 Majas personifikasi mengumpamakan benda mati berprilaku seperti manusia. (+20 XP)";
+                btnElement.classList.add('border-emerald-500', 'bg-emerald-50');
+                currentXP += 20;
+                updateXPDisplay();
+            } else {
+                feedback.className = "p-3 rounded-xl text-xs font-bold text-center bg-rose-100 text-rose-800 border border-rose-200";
+                feedback.innerText = "Hampir tepat! Coba amati opsi B yang menggambarkan pohon nyiur melambai dan menyapa.";
+                btnElement.classList.add('border-rose-500', 'bg-rose-50');
+            }
+        }
+
+        function scrollDailyMissions() {
+            document.getElementById('daily-missions').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
